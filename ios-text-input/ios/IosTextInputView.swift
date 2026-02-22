@@ -132,8 +132,6 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   override func layoutSubviews() {
     super.layoutSubviews()
 
-    if isMultiline && textView.markedTextRange != nil { return }
-
     if textField.frame != bounds { textField.frame = bounds }
     if textView.frame != bounds { textView.frame = bounds }
     if placeholderLabel.frame != bounds { placeholderLabel.frame = bounds }
@@ -141,9 +139,6 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
 
   override var intrinsicContentSize: CGSize {
     if isMultiline && !isInputScrollEnabled {
-      if textView.markedTextRange != nil && lastContentSize != .zero {
-        return lastContentSize
-      }
       let fittingSize = textView.sizeThatFits(
         CGSize(width: bounds.width > 0 ? bounds.width : UIView.layoutFittingExpandedSize.width,
           height: UIView.layoutFittingExpandedSize.height)
@@ -338,10 +333,6 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   // MARK: - Content Size Notification
 
   private func notifyContentSizeChange() {
-    if isMultiline && textView.markedTextRange != nil {
-      return
-    }
-
     let size = textView.sizeThatFits(
       CGSize(width: bounds.width > 0 ? bounds.width : UIView.layoutFittingExpandedSize.width,
              height: UIView.layoutFittingExpandedSize.height)
@@ -581,3 +572,4 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
     isMultiline ? textView.isFirstResponder : textField.isFirstResponder
   }
 }
+
