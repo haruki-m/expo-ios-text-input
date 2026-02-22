@@ -1,8 +1,9 @@
 Pod::Spec.new do |s|
   s.name           = 'IosTextInput'
   s.version        = '1.0.0'
-  s.summary        = ''
-  s.description    = 'Workaround for missing IME composition underline on iOS. Mimics React Native's TextInput component.'
+  s.summary        = 'A native iOS text input wrapper for Expo to preserve CJK IME composition.'
+  s.license        = 'MIT'
+  s.description    = 'Workaround for missing IME composition underline on iOS. Mimics React Native\'s TextInput component.'
   s.author         = 'haruki-m'
   s.homepage       = 'https://docs.expo.dev/modules/'
   s.platforms      = {
@@ -21,3 +22,4 @@ Pod::Spec.new do |s|
 
   s.source_files = "**/*.{h,m,mm,swift,hpp,cpp}"
 end
+
