@@ -1,4 +1,4 @@
-import { requireNativeViewManager } from 'expo-modules-core';
+import { requireNativeViewManager } from "expo-modules-core";
 import {
   ForwardRefExoticComponent,
   RefAttributes,
@@ -6,7 +6,7 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-} from 'react';
+} from "react";
 import {
   Keyboard,
   Platform,
@@ -15,7 +15,7 @@ import {
   TextInput,
   TextStyle,
   type TextInputProps,
-} from 'react-native';
+} from "react-native";
 
 let activeInputBlur: (() => void) | null = null;
 
@@ -44,7 +44,7 @@ type NativeIosTextInputProps = {
   textColor?: string;
   fontSize?: number;
   textAlign?: string;
-  selectionColor?: TextInputProps['selectionColor'];
+  selectionColor?: TextInputProps["selectionColor"];
   caretHidden?: boolean;
 
   // Keyboard / input traits
@@ -59,12 +59,13 @@ type NativeIosTextInputProps = {
 
   // Text content / autofill
   textContentType?: string;
-  passwordRules?: TextInputProps['passwordRules'];
+  passwordRules?: TextInputProps["passwordRules"];
 
   // Behavior
   submitBehavior?: string;
   autoFocus?: boolean;
   contextMenuHidden?: boolean;
+  dismissOnTapOutside?: boolean;
   clearTextOnFocus?: boolean;
   selectTextOnFocus?: boolean;
   selection?: Selection;
@@ -97,61 +98,61 @@ type NativeIosTextInputProps = {
 };
 
 const NativeView = requireNativeViewManager(
-  'IosTextInput',
+  "IosTextInput",
 ) as ForwardRefExoticComponent<
   NativeIosTextInputProps & React.RefAttributes<IosTextInputRef>
 >;
 
 const INPUT_MODE_TO_KEYBOARD_TYPE: Record<
-  NonNullable<TextInputProps['inputMode']>,
-  TextInputProps['keyboardType']
+  NonNullable<TextInputProps["inputMode"]>,
+  TextInputProps["keyboardType"]
 > = {
-  none: 'default',
-  text: 'default',
-  decimal: 'decimal-pad',
-  numeric: 'numeric',
-  tel: 'phone-pad',
-  search: 'web-search',
-  email: 'email-address',
-  url: 'url',
+  none: "default",
+  text: "default",
+  decimal: "decimal-pad",
+  numeric: "numeric",
+  tel: "phone-pad",
+  search: "web-search",
+  email: "email-address",
+  url: "url",
 };
 
 const ENTER_KEY_HINT_TO_RETURN_KEY: Record<
   string,
-  TextInputProps['returnKeyType']
+  TextInputProps["returnKeyType"]
 > = {
-  enter: 'default',
-  done: 'done',
-  next: 'next',
-  search: 'search',
-  send: 'send',
-  go: 'go',
-  previous: 'default', // iOS has no "previous"
+  enter: "default",
+  done: "done",
+  next: "next",
+  search: "search",
+  send: "send",
+  go: "go",
+  previous: "default", // iOS has no "previous"
 };
 
 const AUTO_COMPLETE_TO_TEXT_CONTENT_TYPE: Record<string, string> = {
-  username: 'username',
-  password: 'password',
-  'current-password': 'password',
-  'new-password': 'newPassword',
-  email: 'emailAddress',
-  'one-time-code': 'oneTimeCode',
-  name: 'name',
-  'given-name': 'givenName',
-  'family-name': 'familyName',
-  'additional-name': 'middleName',
-  'honorific-prefix': 'namePrefix',
-  'honorific-suffix': 'nameSuffix',
-  nickname: 'nickname',
-  'cc-number': 'creditCardNumber',
-  'postal-code': 'postalCode',
-  'street-address': 'fullStreetAddress',
-  'address-line1': 'streetAddressLine1',
-  'address-line2': 'streetAddressLine2',
-  tel: 'telephoneNumber',
-  url: 'URL',
-  country: 'countryName',
-  off: 'none',
+  username: "username",
+  password: "password",
+  "current-password": "password",
+  "new-password": "newPassword",
+  email: "emailAddress",
+  "one-time-code": "oneTimeCode",
+  name: "name",
+  "given-name": "givenName",
+  "family-name": "familyName",
+  "additional-name": "middleName",
+  "honorific-prefix": "namePrefix",
+  "honorific-suffix": "nameSuffix",
+  nickname: "nickname",
+  "cc-number": "creditCardNumber",
+  "postal-code": "postalCode",
+  "street-address": "fullStreetAddress",
+  "address-line1": "streetAddressLine1",
+  "address-line2": "streetAddressLine2",
+  tel: "telephoneNumber",
+  url: "URL",
+  country: "countryName",
+  off: "none",
 };
 
 export type IosTextInputRef = {
@@ -180,40 +181,42 @@ export type IosTextInputProps = {
   // Appearance
   textColor?: string;
   fontSize?: number;
-  textAlign?: TextInputProps['textAlign'];
-  selectionColor?: TextInputProps['selectionColor'];
+  textAlign?: TextInputProps["textAlign"];
+  selectionColor?: TextInputProps["selectionColor"];
   caretHidden?: boolean;
 
   // Keyboard / input traits
-  autoCapitalize?: TextInputProps['autoCapitalize'];
+  autoCapitalize?: TextInputProps["autoCapitalize"];
   autoCorrect?: boolean;
   spellCheck?: boolean;
-  keyboardType?: TextInputProps['keyboardType'];
+  keyboardType?: TextInputProps["keyboardType"];
   /** Higher-level alternative to keyboardType (takes precedence). */
-  inputMode?: TextInputProps['inputMode'];
-  returnKeyType?: TextInputProps['returnKeyType'];
+  inputMode?: TextInputProps["inputMode"];
+  returnKeyType?: TextInputProps["returnKeyType"];
   /** Higher-level alternative to returnKeyType (takes precedence). */
-  enterKeyHint?: TextInputProps['enterKeyHint'];
-  keyboardAppearance?: TextInputProps['keyboardAppearance'];
+  enterKeyHint?: TextInputProps["enterKeyHint"];
+  keyboardAppearance?: TextInputProps["keyboardAppearance"];
   enablesReturnKeyAutomatically?: boolean;
   showSoftInputOnFocus?: boolean;
 
   // Text content / autofill
-  textContentType?: TextInputProps['textContentType'];
+  textContentType?: TextInputProps["textContentType"];
   /** Maps to textContentType on iOS. */
-  autoComplete?: TextInputProps['autoComplete'];
-  passwordRules?: TextInputProps['passwordRules'];
+  autoComplete?: TextInputProps["autoComplete"];
+  passwordRules?: TextInputProps["passwordRules"];
 
   // Behavior
-  submitBehavior?: TextInputProps['submitBehavior'];
+  submitBehavior?: TextInputProps["submitBehavior"];
   autoFocus?: boolean;
   contextMenuHidden?: boolean;
+  /** Dismiss keyboard when tapping outside the input. Default: true */
+  dismissOnTapOutside?: boolean;
   clearTextOnFocus?: boolean;
   selectTextOnFocus?: boolean;
   selection?: Selection;
 
   // Single-line only
-  clearButtonMode?: TextInputProps['clearButtonMode'];
+  clearButtonMode?: TextInputProps["clearButtonMode"];
 
   // Multiline only
   scrollEnabled?: boolean;
@@ -261,7 +264,7 @@ export const IosTextInput = ({
   ...rest
 }: IosTextInputProps & RefAttributes<IosTextInputRef>) => {
   // Uncontrolled state (used when `value` is omitted)
-  const [internalValue, setInternalValue] = useState(defaultValue ?? '');
+  const [internalValue, setInternalValue] = useState(defaultValue ?? "");
   const isControlled = value !== undefined;
   const textValue = isControlled ? value : internalValue;
 
@@ -274,22 +277,40 @@ export const IosTextInput = ({
 
   useImperativeHandle(ref, () => ({
     focus: () => {
-      Platform.OS === 'ios'
-        ? nativeRef.current?.focus()
-        : fallbackRef.current?.focus();
+      try {
+        const promise =
+          Platform.OS === "ios"
+            ? (nativeRef.current?.focus() as unknown as
+                | Promise<void>
+                | undefined)
+            : (fallbackRef.current?.focus() as any);
+        promise?.catch?.(() => {});
+      } catch (e) {}
     },
     blur: () => {
-      Platform.OS === 'ios'
-        ? nativeRef.current?.blur()
-        : fallbackRef.current?.blur();
+      try {
+        const promise =
+          Platform.OS === "ios"
+            ? (nativeRef.current?.blur() as unknown as
+                | Promise<void>
+                | undefined)
+            : (fallbackRef.current?.blur() as any);
+        promise?.catch?.(() => {});
+      } catch (e) {}
     },
     clear: () => {
-      Platform.OS === 'ios'
-        ? nativeRef.current?.clear()
-        : fallbackRef.current?.clear();
+      try {
+        const promise =
+          Platform.OS === "ios"
+            ? (nativeRef.current?.clear() as unknown as
+                | Promise<void>
+                | undefined)
+            : (fallbackRef.current?.clear() as any);
+        promise?.catch?.(() => {});
+      } catch (e) {}
     },
     isFocused: () => {
-      return Platform.OS === 'ios'
+      return Platform.OS === "ios"
         ? isFocusedState
         : (fallbackRef.current?.isFocused() ?? false);
     },
@@ -330,7 +351,7 @@ export const IosTextInput = ({
     [onContentSizeChange],
   );
 
-  if (Platform.OS !== 'ios') {
+  if (Platform.OS !== "ios") {
     const {
       textColor,
       fontSize,
@@ -354,7 +375,7 @@ export const IosTextInput = ({
         keyboardType={resolvedKeyboardType}
         returnKeyType={resolvedReturnKeyType}
         textContentType={
-          resolvedTextContentType as TextInputProps['textContentType']
+          resolvedTextContentType as TextInputProps["textContentType"]
         }
         onChangeText={handleChangeText}
         onFocus={onFocus}
@@ -415,7 +436,14 @@ export const IosTextInput = ({
       }
       onInputFocus={() => {
         setIsFocusedState(true);
-        activeInputBlur = () => nativeRef.current?.blur();
+        activeInputBlur = () => {
+          try {
+            const promise = nativeRef.current?.blur() as unknown as
+              | Promise<void>
+              | undefined;
+            promise?.catch?.(() => {});
+          } catch (e) {}
+        };
         onFocus?.();
       }}
       onInputKeyPress={
@@ -447,7 +475,7 @@ export const IosTextInput = ({
   );
 };
 
-IosTextInput.displayName = 'IosTextInput';
+IosTextInput.displayName = "IosTextInput";
 
 const styles = StyleSheet.create({
   singleLineHeight: {

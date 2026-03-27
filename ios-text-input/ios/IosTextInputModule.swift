@@ -232,6 +232,10 @@ public class IosTextInputModule: Module {
         view.setContextMenuHidden(hidden)
       }
 
+      Prop("dismissOnTapOutside") { (view: IosTextInputView, dismiss: Bool) in
+        view.setDismissOnTapOutside(dismiss)
+      }
+
       Prop("clearTextOnFocus") { (view: IosTextInputView, value: Bool) in
         view.clearTextOnFocus = value
       }
@@ -283,3 +287,4 @@ public class IosTextInputModule: Module {
     }
   }
 }
+

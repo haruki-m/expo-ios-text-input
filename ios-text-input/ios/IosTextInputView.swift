@@ -51,8 +51,9 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
 
   // MARK: Stored Properties
 
-  private var tapGesture: UITapGestureRecognizer?
   private var doneToolbar: UIToolbar?
+  private var windowTapGesture: UITapGestureRecognizer?
+  var dismissOnTapOutside: Bool = true
 
   var maxLength: Int?
   var storedPlaceholderColor: UIColor?
@@ -117,14 +118,9 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
     // Placeholder label for UITextView (UITextField has built-in placeholder)
     placeholderLabel.font = textView.font
     placeholderLabel.textColor = UIColor.placeholderText
-    placeholderLabel.numberOfLines = 1
+    placeholderLabel.numberOfLines = 0
     placeholderLabel.isHidden = true
     addSubview(placeholderLabel)
-
-    let gesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-    gesture.cancelsTouchesInView = false
-    self.tapGesture = gesture
-    self.addGestureRecognizer(gesture)
   }
 
   // MARK: - Layout
@@ -134,7 +130,20 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
 
     if textField.frame != bounds { textField.frame = bounds }
     if textView.frame != bounds { textView.frame = bounds }
-    if placeholderLabel.frame != bounds { placeholderLabel.frame = bounds }
+
+    // Position placeholder to match UITextView's text origin (top-left aligned)
+    let inset = textView.textContainerInset
+    let padding = textView.textContainer.lineFragmentPadding
+    let placeholderX = inset.left + padding
+    let placeholderY = inset.top
+    let placeholderWidth = bounds.width - placeholderX - inset.right - padding
+    let placeholderHeight = placeholderLabel.sizeThatFits(
+      CGSize(width: placeholderWidth, height: CGFloat.greatestFiniteMagnitude)
+    ).height
+    let newFrame = CGRect(x: placeholderX, y: placeholderY, width: placeholderWidth, height: placeholderHeight)
+    if placeholderLabel.frame != newFrame {
+      placeholderLabel.frame = newFrame
+    }
   }
 
   override var intrinsicContentSize: CGSize {
@@ -222,7 +231,6 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   func setEditable(_ editable: Bool) {
     textField.isEnabled = editable
     textView.isEditable = editable
-    tapGesture?.cancelsTouchesInView = !editable
   }
 
   func setAutocapitalization(_ type: UITextAutocapitalizationType) {
@@ -279,6 +287,10 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   func setContextMenuHidden(_ hidden: Bool) {
     textField.isContextMenuHidden = hidden
     textView.isContextMenuHidden = hidden
+  }
+
+  func setDismissOnTapOutside(_ dismiss: Bool) {
+    dismissOnTapOutside = dismiss
   }
 
   func setShowSoftInputOnFocus(_ show: Bool) {
@@ -363,10 +375,6 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
 
   // MARK: - Tap Events
 
-  @objc private func handleTap() {
-    onInputPress([:])
-  }
-
   @objc private func handleDoneButtonTap() {
     // Fire the submit event so React knows the user finished typing
     let text = isMultiline ? textView.text : textField.text
@@ -374,6 +382,30 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
 
     // Dismiss the keyboard
     blur()
+  }
+
+  // MARK: - Window Tap to Dismiss
+
+  private func installWindowTapGesture() {
+    guard dismissOnTapOutside else { return }
+    guard windowTapGesture == nil, let window = self.window else { return }
+    let gesture = UITapGestureRecognizer(target: self, action: #selector(handleWindowTap))
+    gesture.cancelsTouchesInView = false
+    window.addGestureRecognizer(gesture)
+    windowTapGesture = gesture
+  }
+
+  private func removeWindowTapGesture() {
+    guard let gesture = windowTapGesture else { return }
+    gesture.view?.removeGestureRecognizer(gesture)
+    windowTapGesture = nil
+  }
+
+  @objc private func handleWindowTap(_ gesture: UITapGestureRecognizer) {
+    let location = gesture.location(in: self)
+    if !bounds.contains(location) {
+      blur()
+    }
   }
 
   // MARK: - UITextField Delegate
@@ -386,6 +418,7 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   }
 
   func textFieldDidBeginEditing(_ textField: UITextField) {
+    installWindowTapGesture()
     onInputFocus([:])
     if clearTextOnFocus {
       textField.text = ""
@@ -399,6 +432,7 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   }
 
   func textFieldDidEndEditing(_ textField: UITextField) {
+    removeWindowTapGesture()
     onInputBlur([:])
     onInputEndEditing(["text": textField.text ?? ""])
   }
@@ -477,6 +511,7 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   }
 
   func textViewDidBeginEditing(_ textView: UITextView) {
+    installWindowTapGesture()
     onInputFocus([:])
     if clearTextOnFocus {
       textView.text = ""
@@ -491,6 +526,7 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   }
 
   func textViewDidEndEditing(_ textView: UITextView) {
+    removeWindowTapGesture()
     onInputBlur([:])
     onInputEndEditing(["text": textView.text ?? ""])
   }
