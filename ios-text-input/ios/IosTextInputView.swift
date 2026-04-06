@@ -53,6 +53,7 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
 
   private var doneToolbar: UIToolbar?
   private var windowTapGesture: UITapGestureRecognizer?
+  private var inputTapGesture: UITapGestureRecognizer?
   var dismissOnTapOutside: Bool = true
 
   var maxLength: Int?
@@ -99,6 +100,12 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
     clipsToBounds = true
+
+    // Input tap gesture for onPress
+    let tap = UITapGestureRecognizer(target: self, action: #selector(handleInputTap))
+    tap.cancelsTouchesInView = false
+    addGestureRecognizer(tap)
+    inputTapGesture = tap
 
     // UITextField setup
     textField.delegate = self
@@ -382,6 +389,10 @@ class IosTextInputView: ExpoView, UITextFieldDelegate, UITextViewDelegate {
 
     // Dismiss the keyboard
     blur()
+  }
+
+  @objc private func handleInputTap() {
+    onInputPress([:])
   }
 
   // MARK: - Window Tap to Dismiss
